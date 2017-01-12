@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/DazzGreenDao.iml" filepath="$PROJECT_DIR$/DazzGreenDao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dazzgreendao/dazzgreendao.iml" filepath="$PROJECT_DIR$/dazzgreendao/dazzgreendao.iml" />
+      <module fileurl="file://$PROJECT_DIR$/dazzgreendaogenerator/dazzgreendaogenerator.iml" filepath="$PROJECT_DIR$/dazzgreendaogenerator/dazzgreendaogenerator.iml" />
+    </modules>
+  </component>
+</project>
