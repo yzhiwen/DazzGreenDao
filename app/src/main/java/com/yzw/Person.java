@@ -14,10 +14,6 @@ public class Person {
     @Id
     @Property
     private long id;
-/*
-    @Property
-    @ToOne(joinProperty = "PersonInfo")
-    private long personInfoId;*/
 
 //    @Id
 //    @Property
