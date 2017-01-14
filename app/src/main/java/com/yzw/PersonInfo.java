@@ -15,7 +15,6 @@ public class PersonInfo {
     @Property
     private long personInfoId;
 
-
     @Property
     private String personInfo;
 
