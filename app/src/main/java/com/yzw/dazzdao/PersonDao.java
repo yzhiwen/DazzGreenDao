@@ -24,6 +24,9 @@ public class PersonDao extends AbstractDao<Person, Long> {
     */
     public static class Properties {
         public final static Property Id = new Property(0, Long.class, "id", true, "ID");
+        public final static Property Name = new Property(1, String.class, "name", false, "NAME");
+        public final static Property Age = new Property(2, Integer.class, "age", false, "AGE");
+        public final static Property PersonInfoId = new Property(3, Long.class, "personInfoId", false, "PERSON_INFO_ID");
     };
 
 
@@ -39,7 +42,10 @@ public class PersonDao extends AbstractDao<Person, Long> {
     public static void createTable(SQLiteDatabase db, boolean ifNotExists) {
         String constraint = ifNotExists? "IF NOT EXISTS ": "";
         db.execSQL("CREATE TABLE " + constraint + "\"PERSON\" (" + //
-                "\"ID\" INTEGER PRIMARY KEY );"); // 0: id
+                "\"ID\" INTEGER PRIMARY KEY ," + // 0: id
+                "\"NAME\" TEXT," + // 1: name
+                "\"AGE\" INTEGER," + // 2: age
+                "\"PERSON_INFO_ID\" INTEGER);"); // 3: personInfoId
     }
 
     /** Drops the underlying database table. */
@@ -57,6 +63,21 @@ public class PersonDao extends AbstractDao<Person, Long> {
         if (id != null) {
             stmt.bindLong(1, id);
         }
+ 
+        String name = entity.getName();
+        if (name != null) {
+            stmt.bindString(2, name);
+        }
+ 
+        Integer age = entity.getAge();
+        if (age != null) {
+            stmt.bindLong(3, age);
+        }
+ 
+        Long personInfoId = entity.getPersonInfoId();
+        if (personInfoId != null) {
+            stmt.bindLong(4, personInfoId);
+        }
     }
 
     /** @inheritdoc */
@@ -69,7 +90,10 @@ public class PersonDao extends AbstractDao<Person, Long> {
     @Override
     public Person readEntity(Cursor cursor, int offset) {
         Person entity = new Person( //
-            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0) // id
+            cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0), // id
+            cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1), // name
+            cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2), // age
+            cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3) // personInfoId
         );
         return entity;
     }
@@ -78,6 +102,9 @@ public class PersonDao extends AbstractDao<Person, Long> {
     @Override
     public void readEntity(Cursor cursor, Person entity, int offset) {
         entity.setId(cursor.isNull(offset + 0) ? null : cursor.getLong(offset + 0));
+        entity.setName(cursor.isNull(offset + 1) ? null : cursor.getString(offset + 1));
+        entity.setAge(cursor.isNull(offset + 2) ? null : cursor.getInt(offset + 2));
+        entity.setPersonInfoId(cursor.isNull(offset + 3) ? null : cursor.getLong(offset + 3));
      }
     
     /** @inheritdoc */

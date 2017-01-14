@@ -17,6 +17,8 @@
  */
 package de.greenrobot.daogenerator;
 
+import com.dazz.dao.ToOneConfig;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -75,6 +77,8 @@ public class Entity {
     private Boolean hasKeepSections;
 
     private String classPackagePath;
+    private List<ToOneConfig> toOneConfigList;
+
 
     Entity(Schema schema, String className) {
         this.schema = schema;
@@ -92,6 +96,18 @@ public class Entity {
         interfacesToImplement = new ArrayList<String>();
         contentProviders = new ArrayList<ContentProvider>();
         constructors = true;
+
+
+        toOneConfigList = new ArrayList<>();
+    }
+
+
+    public void addToOneConfig(ToOneConfig toOneConfig) {
+        toOneConfigList.add(toOneConfig);
+    }
+
+    public List<ToOneConfig> getToOneConfigList() {
+        return toOneConfigList;
     }
 
     public String getClassPackagePath() {

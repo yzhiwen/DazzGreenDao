@@ -9,7 +9,6 @@ import com.dazz.dao.annotation.Unique;
 import com.google.auto.service.AutoService;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -61,23 +60,27 @@ public class GreenDaoExtension extends AbstractProcessor {
 
         Map<String, Schema> mSchemaMap = new HashMap<>();
         Map<Schema, Map<String, de.greenrobot.daogenerator.Entity>> mEntityMap = new HashMap<>();
-        Map<de.greenrobot.daogenerator.Entity, Map<String, de.greenrobot.daogenerator.Property>> toOneMap = new HashMap<>();
+        Map<de.greenrobot.daogenerator.Entity, Map<String, String>>
+                // <Entity,Map<fkey,fClassName>>
+                toOneMap = new HashMap<>();
+        Map<String, String> fkeyClassMap = new HashMap<>();
 
         initSchema(roundEnv, mSchemaMap);
 
-        initEntry(roundEnv, mSchemaMap, mEntityMap, toOneMap);
+        initEntry(roundEnv, mSchemaMap, mEntityMap, toOneMap, fkeyClassMap);
 
+        for (Map.Entry<de.greenrobot.daogenerator.Entity, Map<String, String>> entityToOneEntry : toOneMap.entrySet()) {
+            de.greenrobot.daogenerator.Entity entity = entityToOneEntry.getKey();
+            Map<String, String> entityToOne = entityToOneEntry.getValue();
 
-        for (Map.Entry<de.greenrobot.daogenerator.Entity, Map<String, de.greenrobot.daogenerator.Property>> entry : toOneMap.entrySet()) {
-            de.greenrobot.daogenerator.Entity entity = entry.getKey();
-            Map<String, de.greenrobot.daogenerator.Property> list = entry.getValue();
-            for (Map.Entry<String, de.greenrobot.daogenerator.Property> toEntryInfo : list.entrySet()) {
-                String toEntityName = toEntryInfo.getKey();
-                de.greenrobot.daogenerator.Property property = toEntryInfo.getValue();
-                de.greenrobot.daogenerator.Entity toEntity = mEntityMap.get(entry.getKey().getSchema()).get(toEntityName);
-                if (toEntity == null)
-                    throw new IllegalArgumentException("ToOne " + toEntityName + " is not found!");
-                entity.addToOne(toEntity, property);
+            for (Map.Entry<String, String> toOne : entityToOne.entrySet()) {
+                String fkey = toOne.getKey();
+                String fkeyClassType = fkeyClassMap.get(fkey);
+                String fClass = toOne.getValue();
+
+                entity.addLongProperty(fkey);
+                env.getMessager().printMessage(Diagnostic.Kind.NOTE, "----------> add to one config fkey: " + fkey + " class name: " + fClass);
+                entity.addToOneConfig(new ToOneConfig(entity, fkey, fkeyClassType, fClass));
             }
 
         }
@@ -100,7 +103,7 @@ public class GreenDaoExtension extends AbstractProcessor {
         }
     }
 
-    private void initEntry(RoundEnvironment roundEnv, Map<String, Schema> mSchemaMap, Map<Schema, Map<String, de.greenrobot.daogenerator.Entity>> mEntityMap, Map<de.greenrobot.daogenerator.Entity, Map<String, de.greenrobot.daogenerator.Property>> toOneMap) {
+    private void initEntry(RoundEnvironment roundEnv, Map<String, Schema> mSchemaMap, Map<Schema, Map<String, de.greenrobot.daogenerator.Entity>> mEntityMap, Map<de.greenrobot.daogenerator.Entity, Map<String, String>> toOneMap, Map<String, String> fkeyClassMap) {
         Set<? extends Element> entitySet = roundEnv.getElementsAnnotatedWith(Entity.class);
         for (Element e : entitySet) {
 
@@ -182,9 +185,9 @@ public class GreenDaoExtension extends AbstractProcessor {
                             if (declared.equals(String.class.getName())) {
                                 propertyBuilder = entity.addStringProperty(propertyNameInDb);
                             } else if (declared.contains(List.class.getName())) {
-                                throw new IllegalArgumentException("please use @ToOne to support List");
+//                                throw new IllegalArgumentException("please use @ToOne to support List");
                             } else if (declared.contains(Map.class.getName())) {
-                                throw new IllegalArgumentException("please use @ToMany to support Map");
+//                                throw new IllegalArgumentException("please use @ToMany to support Map");
                             }
                             break;
                         case INT:
@@ -208,6 +211,29 @@ public class GreenDaoExtension extends AbstractProcessor {
                         case DOUBLE:
                             propertyBuilder = entity.addDoubleProperty(propertyNameInDb);
                             break;
+                    }
+
+                    ToOne toOne = el.getAnnotation(ToOne.class);
+                    if (toOne != null) {
+                        String fkey = toOne.foreignKey();
+                        String fkeyType = toOne.foreignKeyType();
+                        if (!fkeyType.toUpperCase().equals("LONG") && !fkeyType.equals("String"))
+                            throw new IllegalArgumentException("ToOne foreign key type is error, only accept long or String, but " + fkeyType);
+                        String className = el.asType().toString();
+                        env.getMessager().printMessage(Diagnostic.Kind.NOTE, "////// ToOne: fkey: " + fkey + " fkeyType: " + fkeyType + " className: " + className);
+
+                        Map<String, String> entityToOneMap = toOneMap.get(entity);
+                        if (entityToOneMap == null) {
+                            entityToOneMap = new HashMap<>();
+                            toOneMap.put(entity, entityToOneMap);
+                        }
+                        entityToOneMap.put(fkey, className);
+
+                        fkeyClassMap.put(fkey, fkeyType);
+
+                        // ToOne don't support id....,
+                        // TODO: 2017/1/14 0014 check if has id
+                        continue;
                     }
 
                     if (propertyBuilder == null) {
@@ -241,17 +267,6 @@ public class GreenDaoExtension extends AbstractProcessor {
 
                     // 没有扩展OrderBy
 
-
-                    ToOne toOne = el.getAnnotation(ToOne.class);
-                    if (toOne != null) {
-                        String toOneEntityName = toOne.joinProperty();
-                        Map<String, de.greenrobot.daogenerator.Property> entityToOneMap = (Map<String, de.greenrobot.daogenerator.Property>) toOneMap.get(entity);
-                        if (entityToOneMap == null) {
-                            entityToOneMap = new HashMap<>();
-                            toOneMap.put(entity, entityToOneMap);
-                        }
-                        entityToOneMap.put(toOneEntityName,propertyBuilder.getProperty());
-                    }
 
                 }
             }

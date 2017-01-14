@@ -17,7 +17,7 @@ public class OtherInfo {
     private boolean isOk;
 
     @Property
-    @Id
+//    @Id
     private String info;
 
 

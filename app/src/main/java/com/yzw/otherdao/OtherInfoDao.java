@@ -14,7 +14,7 @@ import com.yzw.OtherInfo;
 /** 
  * DAO for table "OTHER_INFO".
 */
-public class OtherInfoDao extends AbstractDao<OtherInfo, Void> {
+public class OtherInfoDao extends AbstractDao<OtherInfo, String> {
 
     public static final String TABLENAME = "OTHER_INFO";
 
@@ -25,7 +25,7 @@ public class OtherInfoDao extends AbstractDao<OtherInfo, Void> {
     public static class Properties {
         public final static Property Id = new Property(0, String.class, "id", true, "ID");
         public final static Property IsOk = new Property(1, Boolean.class, "isOk", false, "IS_OK");
-        public final static Property Info = new Property(2, String.class, "info", true, "INFO");
+        public final static Property Info = new Property(2, String.class, "info", false, "INFO");
     };
 
 
@@ -43,7 +43,7 @@ public class OtherInfoDao extends AbstractDao<OtherInfo, Void> {
         db.execSQL("CREATE TABLE " + constraint + "\"OTHER_INFO\" (" + //
                 "\"ID\" TEXT PRIMARY KEY NOT NULL ," + // 0: id
                 "\"IS_OK\" INTEGER," + // 1: isOk
-                "\"INFO\" TEXT PRIMARY KEY NOT NULL );"); // 2: info
+                "\"INFO\" TEXT);"); // 2: info
     }
 
     /** Drops the underlying database table. */
@@ -75,8 +75,8 @@ public class OtherInfoDao extends AbstractDao<OtherInfo, Void> {
 
     /** @inheritdoc */
     @Override
-    public Void readKey(Cursor cursor, int offset) {
-        return null;
+    public String readKey(Cursor cursor, int offset) {
+        return cursor.isNull(offset + 0) ? null : cursor.getString(offset + 0);
     }    
 
     /** @inheritdoc */
@@ -100,15 +100,18 @@ public class OtherInfoDao extends AbstractDao<OtherInfo, Void> {
     
     /** @inheritdoc */
     @Override
-    protected Void updateKeyAfterInsert(OtherInfo entity, long rowId) {
-        // Unsupported or missing PK type
-        return null;
+    protected String updateKeyAfterInsert(OtherInfo entity, long rowId) {
+        return entity.getId();
     }
     
     /** @inheritdoc */
     @Override
-    public Void getKey(OtherInfo entity) {
-        return null;
+    public String getKey(OtherInfo entity) {
+        if(entity != null) {
+            return entity.getId();
+        } else {
+            return null;
+        }
     }
 
     /** @inheritdoc */

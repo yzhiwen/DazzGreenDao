@@ -33,6 +33,7 @@ public class DaoGeneratorHelper {
     private Template templateDaoSession;
     private Template templateEntity;
     private Template templateContentProvider;
+    private Template templateDazzSupport;
 
     public DaoGeneratorHelper() throws IOException {
         System.out.println("greenDAO Generator");
@@ -50,6 +51,7 @@ public class DaoGeneratorHelper {
         templateDaoSession = config.getTemplate("dao-session.ftl");
         templateEntity = config.getTemplate("entity.ftl");
         templateContentProvider = config.getTemplate("content-provider.ftl");
+        templateDazzSupport = config.getTemplate("dazz-support.ftl");
     }
 
     private Configuration getConfiguration() throws IOException {
@@ -106,7 +108,12 @@ public class DaoGeneratorHelper {
                 generate(templateContentProvider, outDirFile, entity.getJavaPackage(), entity.getClassName()
                         + "ContentProvider", schema, entity, additionalObjectsForTemplate);
             }
+
+            if (entity.getToOneConfigList().size() != 0) {
+                generate(templateDazzSupport, outDirFile, entity.getJavaPackage(), "Dazz" + entity.getClassName(), schema, entity);
+            }
         }
+
         generate(templateDaoMaster, outDirFile, schema.getDefaultJavaPackageDao(), schema.getSchemaName() + "DaoMaster", schema, null);
         generate(templateDaoSession, outDirFile, schema.getDefaultJavaPackageDao(), schema.getSchemaName() + "DaoSession", schema, null);
 
