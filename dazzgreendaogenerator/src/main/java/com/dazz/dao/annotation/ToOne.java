@@ -17,15 +17,18 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 @Target(ElementType.FIELD)
 public @interface ToOne {
+
     /**
-     * Name of the property inside the current entity which holds the key of related entity.
-     * If this parameter is absent, then an additional column is automatically created to hold the key.
+     * 关联实体类的关联键，注意，需要定义在实体类中的表当中
+     *
+     * @return
      */
     String foreignKey();
 
 
     /**
      * Only the Long and String
+     *
      * @return
      */
     String foreignKeyType();

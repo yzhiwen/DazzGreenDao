@@ -18,7 +18,6 @@ public class PersonInfo {
     @Property
     private String personInfo;
 
-
     public PersonInfo(long personInfoId, String personInfo) {
         this.personInfoId = personInfoId;
         this.personInfo = personInfo;
