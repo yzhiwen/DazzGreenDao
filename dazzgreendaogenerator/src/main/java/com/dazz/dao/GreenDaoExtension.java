@@ -4,6 +4,7 @@ import com.dazz.dao.annotation.Entity;
 import com.dazz.dao.annotation.Id;
 import com.dazz.dao.annotation.NotNull;
 import com.dazz.dao.annotation.Property;
+import com.dazz.dao.annotation.ToMany;
 import com.dazz.dao.annotation.ToOne;
 import com.dazz.dao.annotation.Unique;
 import com.google.auto.service.AutoService;
@@ -80,7 +81,7 @@ public class GreenDaoExtension extends AbstractProcessor {
 
                 entity.addLongProperty(fkey);
                 env.getMessager().printMessage(Diagnostic.Kind.NOTE, "----------> add to one config fkey: " + fkey + " class name: " + fClass);
-                entity.addToOneConfig(new ToOneConfig(entity, fkey, fkeyClassType, fClass));
+                entity.addToOneConfig(new ToOneRelation(entity, fkey, fkeyClassType, fClass));
             }
 
         }
@@ -232,6 +233,31 @@ public class GreenDaoExtension extends AbstractProcessor {
                         fkeyClassMap.put(fkey, fkeyType);
 
                         // ToOne don't support id....,
+                        // TODO: 2017/1/14 0014 check if has id
+                        continue;
+                    }
+
+                    ToMany toMany = el.getAnnotation(ToMany.class);
+                    if (toMany != null) {
+                        String rfkey = toMany.referencedfKey();
+                        String rkey = toMany.referencedKey();
+                        String toManyClassType = el.asType().toString();
+
+                        if (!toManyClassType.startsWith("java.util.List") && !toManyClassType.startsWith("java.util.ArrayList"))
+                            throw new IllegalArgumentException("ToMany only support List or ArrayList, please check!");
+
+                        int index = toManyClassType.indexOf("<");
+                        int lastIndex = toManyClassType.lastIndexOf(">");
+                        String toClassType = null;
+                        if (index != -1)
+                            toClassType = toManyClassType.substring(index + 1, lastIndex);
+                        env.getMessager().printMessage(Diagnostic.Kind.NOTE, "////////// " +
+                                "ToMany fkey " + rfkey + " toManyClassType: " + toManyClassType + " toClassType: " + toClassType);
+
+                        ToManyRelation toManyRelation = new ToManyRelation(rkey,toClassType);
+                        entity.addToManyRelationList(toManyRelation);
+
+                        // ToMany don't support id....,
                         // TODO: 2017/1/14 0014 check if has id
                         continue;
                     }

@@ -17,7 +17,8 @@
  */
 package de.greenrobot.daogenerator;
 
-import com.dazz.dao.ToOneConfig;
+import com.dazz.dao.ToManyRelation;
+import com.dazz.dao.ToOneRelation;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -77,7 +78,8 @@ public class Entity {
     private Boolean hasKeepSections;
 
     private String classPackagePath;
-    private List<ToOneConfig> toOneConfigList;
+    private List<ToOneRelation> toOneRelationList;
+    private List<ToManyRelation> toManyRelationList;
 
 
     Entity(Schema schema, String className) {
@@ -98,16 +100,24 @@ public class Entity {
         constructors = true;
 
 
-        toOneConfigList = new ArrayList<>();
+        toOneRelationList = new ArrayList<>();
+        toManyRelationList = new ArrayList<>();
     }
 
-
-    public void addToOneConfig(ToOneConfig toOneConfig) {
-        toOneConfigList.add(toOneConfig);
+    public List<ToManyRelation> getToManyRelationList() {
+        return toManyRelationList;
     }
 
-    public List<ToOneConfig> getToOneConfigList() {
-        return toOneConfigList;
+    public void addToManyRelationList(ToManyRelation toManyRelation) {
+        this.toManyRelationList.add(toManyRelation);
+    }
+
+    public void addToOneConfig(ToOneRelation toOneConfig) {
+        toOneRelationList.add(toOneConfig);
+    }
+
+    public List<ToOneRelation> getToOneConfigList() {
+        return toOneRelationList;
     }
 
     public String getClassPackagePath() {

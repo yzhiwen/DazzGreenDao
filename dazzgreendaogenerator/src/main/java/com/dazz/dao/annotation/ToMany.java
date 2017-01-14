@@ -15,11 +15,13 @@ public @interface ToMany {
      * Name of the property inside the target entity which holds id of the source (current) entity
      * Required unless no {@link JoinProperty} or {@link JoinEntity} is specified
      */
-    String referencedJoinProperty() default "";
+    String referencedfKey();
+
+    String referencedKey();
 
     /**
      * Array of matching source -> target properties
      * Required unless {@link #referencedJoinProperty()} or {@link JoinEntity} is specified
      */
-    JoinProperty[] joinProperties() default {};
+//    JoinProperty[] joinProperties() default {};
 }

@@ -6,7 +6,7 @@ import de.greenrobot.daogenerator.Entity;
  * @author yzw
  */
 
-public class ToOneConfig {
+public class ToOneRelation {
 
     private Entity entity;
     private String fkey;
@@ -15,7 +15,7 @@ public class ToOneConfig {
     private String fClass;
     private String fClassName;
 
-    public ToOneConfig(Entity entity, String fkey, String fkeyClass, String fClass) {
+    public ToOneRelation(Entity entity, String fkey, String fkeyClass, String fClass) {
         this.entity = entity;
         this.fkey = fkey;
         this.fkeyClass = fkeyClass;

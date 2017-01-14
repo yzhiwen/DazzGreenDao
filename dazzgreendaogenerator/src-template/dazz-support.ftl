@@ -6,6 +6,10 @@ import com.yzw.dazzgreendao.AppDaoManager;
 import ${item.fClass};
 </#list>
 
+<#list entity.toManyRelationList as item>
+import ${item.rClass};
+</#list>
+
 public abstract class ${schema.schemaName}${entity.className} {
 
     <#list entity.toOneConfigList as item>
@@ -22,4 +26,17 @@ public abstract class ${schema.schemaName}${entity.className} {
     }
 
     </#list>
+
+    <#list entity.toManyRelationList as item>
+    protected abstract long toMany${item.rKey?cap_first}();
+
+    public List<Song> get${item.rClassName}List() {
+         return AppDaoManager.get("${schema.schemaName}")
+                .query(${item.rClassName}.class)
+                .where(${item.rClassName}Dao.Properties.${item.rKey?cap_first}.eq(toMany${item.rKey?cap_first}()))
+                .build().list();
+    }
+
+    </#list>
+
 }

@@ -109,7 +109,7 @@ public class DaoGeneratorHelper {
                         + "ContentProvider", schema, entity, additionalObjectsForTemplate);
             }
 
-            if (entity.getToOneConfigList().size() != 0) {
+            if (entity.getToOneConfigList().size() != 0 || entity.getToManyRelationList().size() != 0) {
                 generate(templateDazzSupport, outDirFile, entity.getJavaPackage(), "Dazz" + entity.getClassName(), schema, entity);
             }
         }
